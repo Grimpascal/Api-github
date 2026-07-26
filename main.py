@@ -1,14 +1,15 @@
 from fastapi import FastAPI, HTTPException
 import requests
 from bs4 import BeautifulSoup
+import cloudscraper
 
 app = FastAPI()
 
 @app.get("/")
 def home():
-    return {"message": "API Scraper GitHub Aktif! Gunakan endpoint /api/github?username=NAMA_USER"}
+    return {"message": "API Scraper GitHub Aktif! Gunakan endpoint /github?username=NAMA_USER"}
 
-@app.get("/api/github")
+@app.get("/github")
 def get_github_repositories(username: str = "Grimpascal"):
     url = f"https://github.com/{username}?tab=repositories"
     headers = {
@@ -67,3 +68,68 @@ def get_github_repositories(username: str = "Grimpascal"):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+    
+@app.get("/anime-ongoing")
+def filmPahe():
+    url = "https://otakudesu.blog/"
+    headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+        }
+
+    try:
+        respon = requests.get(url, headers=headers ,timeout=10)
+        respon.raise_for_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil data dari otakudesu: {str(e)}")
+    
+    soup = BeautifulSoup(respon.text, 'html.parser')
+    mentah = soup.find_all('div', class_='detpost')[:15]
+    
+
+    hasil=[]
+    for block in mentah:
+        nama_anime = "N/A"
+        thumbnail = "N/A"
+        eps = "N/A"
+        date = "N/A"
+        link = "N/A"
+
+        eps_element = block.find('div', class_='epz')
+        if eps_element:
+            eps = eps_element.get_text(strip=True)
+
+        nama_element = block.find('div', class_='thumb')
+        if nama_element:
+            h2_tag = nama_element.find('h2', class_='jdlflm')
+            if h2_tag:
+                nama_anime = h2_tag.get_text(strip=True) 
+
+        date_element = block.find('div', class_='newnime')
+        if date_element:
+            date = date_element.get_text(strip=True)
+
+        thumbnail_element = block.find('div', class_='thumb')
+        if thumbnail_element:
+            a_tag = thumbnail_element.find('a')
+            if a_tag:
+                link = a_tag.get('href')
+            div_tag = thumbnail_element.find('div', class_='thumbz')
+            if div_tag:
+                img_tag = div_tag.find('img', class_='attachment-thumb size-thumb wp-post-image')
+                if img_tag:
+                    thumbnail = img_tag.get('src')
+
+        hasil.append({
+            "nama_anime" : nama_anime,
+            "up_date" : date,
+            "eps" : eps,
+            "thumb" : thumbnail,
+            "link" : link
+        })
+
+    return {
+        "status": "success",
+        "total": len(hasil),
+        "data" : hasil
+    }
