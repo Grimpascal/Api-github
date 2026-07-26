@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from curl_cffi import requests
 from bs4 import BeautifulSoup
+import urllib.parse
 
 app = FastAPI()
 
