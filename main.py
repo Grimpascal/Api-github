@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from requests import requests
+import requests
 from bs4 import BeautifulSoup
 import urllib.parse
 

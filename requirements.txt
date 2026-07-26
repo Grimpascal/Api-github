@@ -2,4 +2,3 @@ fastapi
 requests
 beautifulsoup4
 uvicorn
-curl_cffi
