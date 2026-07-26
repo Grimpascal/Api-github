@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import urllib.parse
 
 app = FastAPI()
-SCRAPER_API_KEY = "873dca65bbe21b67d191154550cacd0a"
 
 @app.get("/")
 def home():
