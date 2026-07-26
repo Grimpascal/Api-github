@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from curl_cffi import requests
+from requests import requests
 from bs4 import BeautifulSoup
 import urllib.parse
 
 app = FastAPI()
+SCRAPER_API_KEY = "873dca65bbe21b67d191154550cacd0a"
 
 @app.get("/")
 def home():
@@ -71,21 +72,24 @@ def get_github_repositories(username: str = "Grimpascal"):
 
     
 @app.get("/anime-ongoing")
-def filmPahe():
+def animeOngoing():
     url = "https://otakudesu.cloud/"
-    proxy_url = f"https://api.allorigins.win/get?url={urllib.parse.quote(url)}"
+    
+    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={urllib.parse.quote(url)}"
 
     try:
-        respon = requests.get(proxy_url, impersonate="chrome110" ,timeout=15)
+        respon = requests.get(proxy_url, timeout=8)
         respon.raise_for_status()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gagal mengambil data dari otakudesu: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Gagal mengambil data dari Otakudesu: {str(e)}"
+        )
     
     soup = BeautifulSoup(respon.text, 'html.parser')
     mentah = soup.find_all('div', class_='detpost')[:15]
-    
 
-    hasil=[]
+    hasil = []
     for block in mentah:
         nama_anime = "N/A"
         thumbnail = "N/A"
@@ -112,22 +116,23 @@ def filmPahe():
             a_tag = thumbnail_element.find('a')
             if a_tag:
                 link = a_tag.get('href')
+                
             div_tag = thumbnail_element.find('div', class_='thumbz')
             if div_tag:
-                img_tag = div_tag.find('img', class_='attachment-thumb size-thumb wp-post-image')
+                img_tag = div_tag.find('img')
                 if img_tag:
-                    thumbnail = img_tag.get('src')
+                    thumbnail = img_tag.get('src') or img_tag.get('data-src') or "N/A"
 
         hasil.append({
-            "nama_anime" : nama_anime,
-            "up_date" : date,
-            "eps" : eps,
-            "thumb" : thumbnail,
-            "link" : link
+            "nama_anime": nama_anime,
+            "up_date": date,
+            "eps": eps,
+            "thumb": thumbnail,
+            "link": link
         })
 
     return {
         "status": "success",
         "total": len(hasil),
-        "data" : hasil
+        "data": hasil
     }
