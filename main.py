@@ -72,12 +72,9 @@ def get_github_repositories(username: str = "Grimpascal"):
 @app.get("/anime-ongoing")
 def filmPahe():
     url = "https://otakudesu.cloud/"
-    headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
-        }
 
     try:
-        respon = requests.get(url, headers=headers ,timeout=10)
+        respon = requests.get(url, impersonate="chrome110" ,timeout=10)
         respon.raise_for_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil data dari otakudesu: {str(e)}")
