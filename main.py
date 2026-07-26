@@ -75,7 +75,7 @@ def get_github_repositories(username: str = "Grimpascal"):
 def animeOngoing():
     url = "https://otakudesu.cloud/"
     
-    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={urllib.parse.quote(url)}"
+    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={urllib.parse.quote(url)}&render=false"
 
     try:
         respon = requests.get(proxy_url, timeout=8)
