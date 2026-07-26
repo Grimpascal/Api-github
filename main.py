@@ -74,7 +74,7 @@ def filmPahe():
     url = "https://otakudesu.cloud/"
 
     try:
-        respon = requests.get(url, impersonate="chrome110" ,timeout=10)
+        respon = requests.get(url, impersonate="chrome110" ,timeout=15)
         respon.raise_for_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil data dari otakudesu: {str(e)}")
