@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-import requests
+from curl_cffi import requests
 from bs4 import BeautifulSoup
 import urllib.parse
 
@@ -73,13 +73,17 @@ def get_github_repositories(username: str = "Grimpascal"):
 @app.get("/anime-ongoing")
 def animeOngoing():
     url = "https://otakudesu.cloud/"
-    proxy_url = f"https://corsproxy.io/?{urllib.parse.quote(url)}"
 
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-        respon = requests.get(proxy_url, headers=headers, timeout=7)
+        respon = requests.get(
+            url, 
+            impersonate="chrome120", 
+            timeout=10,
+            headers={
+                "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Referer": "https://google.com"
+            }
+        )
         respon.raise_for_status()
     except Exception as e:
         raise HTTPException(
@@ -88,7 +92,9 @@ def animeOngoing():
         )
     
     soup = BeautifulSoup(respon.text, 'html.parser')
-    mentah = soup.find_all('div', class_='detpost')[:15]
+    
+    mentah = soup.find_all('div', class_='detpost')
+    mentah = mentah[:15]
 
     hasil = []
     for block in mentah:
@@ -98,7 +104,7 @@ def animeOngoing():
         date = "N/A"
         link = "N/A"
 
-        eps_element = block.find('div', class_='epz')
+        eps_element = block.find('div', class_='epz') or block.find('div', class_='epzti')
         if eps_element:
             eps = eps_element.get_text(strip=True)
 
@@ -108,21 +114,19 @@ def animeOngoing():
             if h2_tag:
                 nama_anime = h2_tag.get_text(strip=True) 
 
-        date_element = block.find('div', class_='newnime')
-        if date_element:
-            date = date_element.get_text(strip=True)
-
-        thumbnail_element = block.find('div', class_='thumb')
-        if thumbnail_element:
-            a_tag = thumbnail_element.find('a')
+            a_tag = nama_element.find('a')
             if a_tag:
-                link = a_tag.get('href')
+                link = a_tag.get('href', 'N/A')
                 
-            div_tag = thumbnail_element.find('div', class_='thumbz')
+            div_tag = nama_element.find('div', class_='thumbz')
             if div_tag:
                 img_tag = div_tag.find('img')
                 if img_tag:
                     thumbnail = img_tag.get('src') or img_tag.get('data-src') or "N/A"
+
+        date_element = block.find('div', class_='newnime')
+        if date_element:
+            date = date_element.get_text(strip=True)
 
         hasil.append({
             "nama_anime": nama_anime,
