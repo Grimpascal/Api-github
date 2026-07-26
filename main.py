@@ -74,11 +74,13 @@ def get_github_repositories(username: str = "Grimpascal"):
 @app.get("/anime-ongoing")
 def animeOngoing():
     url = "https://otakudesu.cloud/"
-    
-    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={urllib.parse.quote(url)}&render=false"
+    proxy_url = f"https://corsproxy.io/?{urllib.parse.quote(url)}"
 
     try:
-        respon = requests.get(proxy_url, timeout=8)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        respon = requests.get(proxy_url, headers=headers, timeout=7)
         respon.raise_for_status()
     except Exception as e:
         raise HTTPException(
