@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import requests
 from bs4 import BeautifulSoup
-import cloudscraper
 
 app = FastAPI()
 
