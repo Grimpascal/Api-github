@@ -71,7 +71,7 @@ def get_github_repositories(username: str = "Grimpascal"):
     
 @app.get("/anime-ongoing")
 def filmPahe():
-    url = "https://otakudesu.blog/"
+    url = "https://otakudesu.cloud/"
     headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
         }
