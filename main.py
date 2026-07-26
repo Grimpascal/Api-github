@@ -72,9 +72,10 @@ def get_github_repositories(username: str = "Grimpascal"):
 @app.get("/anime-ongoing")
 def filmPahe():
     url = "https://otakudesu.cloud/"
+    proxy_url = f"https://api.allorigins.win/get?url={urllib.parse.quote(url)}"
 
     try:
-        respon = requests.get(url, impersonate="chrome110" ,timeout=15)
+        respon = requests.get(proxy_url, impersonate="chrome110" ,timeout=15)
         respon.raise_for_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil data dari otakudesu: {str(e)}")
